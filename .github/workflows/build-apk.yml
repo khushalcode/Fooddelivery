@@ -21,12 +21,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Expo version check
-        run: |
-          node -v
-          npx expo install --check || true
-          npx expo-doctor || true
-
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
@@ -43,15 +37,9 @@ jobs:
         env:
           CI: 1
 
-      - name: Run autolinking exactly like Gradle (prints real error)
-        working-directory: android
-        run: |
-          node --no-warnings --eval "require('expo/bin/autolinking')" expo-modules-autolinking react-native-config --json --platform android 2>&1 | tail -n 60
-          test ${PIPESTATUS[0]} -eq 0
-        shell: bash
-
       - name: Configure Gradle
         run: |
+          printf '\n' >> android/gradle.properties
           echo "org.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m" >> android/gradle.properties
           echo "org.gradle.parallel=false" >> android/gradle.properties
           echo "reactNativeArchitectures=arm64-v8a" >> android/gradle.properties
@@ -61,15 +49,7 @@ jobs:
 
       - name: Build release APK
         working-directory: android
-        run: ./gradlew assembleRelease --info --stacktrace 2>&1 | tee ../gradle.log; test ${PIPESTATUS[0]} -eq 0
-        shell: bash
-
-      - name: Upload build log on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: gradle-log
-          path: gradle.log
+        run: ./gradlew assembleRelease --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
