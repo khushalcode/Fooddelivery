@@ -21,6 +21,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Check Expo dependency versions
+        run: npx expo install --check || true
+
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
@@ -37,17 +40,21 @@ jobs:
         env:
           CI: 1
 
-      - name: Increase Gradle memory
+      - name: Debug autolinking (shows the real node error)
+        run: npx expo-modules-autolinking resolve --platform android --json > /dev/null
+
+      - name: Configure Gradle
         run: |
           echo "org.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m" >> android/gradle.properties
           echo "org.gradle.parallel=false" >> android/gradle.properties
+          echo "reactNativeArchitectures=arm64-v8a" >> android/gradle.properties
 
       - name: Make gradlew executable
         run: chmod +x android/gradlew
 
       - name: Build release APK
         working-directory: android
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleRelease --stacktrace --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
