@@ -22,7 +22,10 @@
         "backgroundColor": "#3B82F6"
       },
       "package": "com.vendor.app",
-      "permissions": ["android.permission.CAMERA", "android.permission.READ_EXTERNAL_STORAGE"]
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -42,7 +45,8 @@
       ],
       "expo-secure-store",
       "expo-image-picker",
-      "expo-font"
+      "expo-font",
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": "enable"
